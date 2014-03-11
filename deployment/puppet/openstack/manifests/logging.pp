@@ -51,6 +51,13 @@ validate_re($role, 'client|server')
 validate_re($rotation, 'daily|weekly|monthly|yearly')
 
 if $role == 'client' {
+
+  include rsyslog::params
+
+  file { "${rsyslog::params::rsyslog_d}70-zabbix-server.conf":
+    content => template("openstack/70-zabbix-server.conf.erb"),
+  }
+
   class { "::rsyslog::client":
     high_precision_timestamps => $show_timezone,
     log_remote     => $log_remote,

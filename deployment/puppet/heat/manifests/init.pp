@@ -37,6 +37,7 @@ class heat(
   $amqp_password            = 'heat',
   $rabbit_ha_queues         = false,
   $rabbit_virtualhost       = '/',
+  $queue_provider           = 'rabbitmq',
 ) {
 
   validate_string($keystone_password)
@@ -85,6 +86,7 @@ class heat(
     api_cfn_bind_port              => $api_cfn_bind_port,
     api_cloudwatch_bind_host       => $api_cloudwatch_bind_host,
     api_cloudwatch_bind_port       => $api_cloudwatch_bind_port,
+    queue_provider                 => $queue_provider,
   }
 
   class { 'heat::client' :

@@ -66,7 +66,7 @@ class openstack::compute (
   # Nova
   $purge_nova_config             = false,
   # RPC
-  $queue_provider                = 'rabbitmq',
+  $queue_provider                = 'qpid',
   $amqp_hosts                    = false,
   $amqp_user                     = 'nova',
   $amqp_password                 = 'rabbit_pw',

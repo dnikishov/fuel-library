@@ -5,7 +5,7 @@ class openstack::ha::haproxy (
   $internal_virtual_ip      = undef,
   $horizon_use_ssl          = false,
   $neutron                  = false,
-  $queue_provider           = 'rabbitmq',
+  $queue_provider           = 'qpid',
   $custom_mysql_setup_class = 'galera',
   $swift_proxies            = undef,
   $rgw_servers              = undef,

@@ -11,7 +11,7 @@ class nova::metadata_api (
   $listen_ip         = '0.0.0.0',
   $controller_nodes  = ['127.0.0.1'],
   $rpc_backend       = 'nova.rpc.impl_kombu',
-  $queue_provider    = 'rabbitmq',
+  $queue_provider    = 'qpid',
   $rabbit_user       = 'rabbit_user',
   $rabbit_password   = 'rabbit_password',
   $rabbit_ha_virtual_ip= false,
@@ -58,10 +58,11 @@ class nova::metadata_api (
         $qpid_hosts = join(regsubst($controller_nodes, '$', ':5672'), ',')
       }
       nova_config {
-        'DEFAULT/qpid_hosts':              value => $qpid_hosts;
-        'DEFAULT/qpid_username':             value => $qpid_user;
-        'DEFAULT/qpid_password':           value => $qpid_password;
+        'DEFAULT/qpid_hosts':              value => $rabbit_hosts;
+        'DEFAULT/qpid_username':             value => $rabbit_user;
+        'DEFAULT/qpid_password':           value => $rabbit_password;
         'DEFAULT/rpc_backend':             value => 'nova.rpc.impl_qpid';
+        'DEFAULT/qpid_sasl_mechanism': value => 'DIGEST-MD5';
       }
     }
   }

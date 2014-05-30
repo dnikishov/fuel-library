@@ -1,0 +1,7 @@
+qpid-cpp-client
+qpid-cpp-server
+qpid-cpp-server-ssl
+qpid-cpp-server-store
+qpid-tests
+qpid-tools
+qpid-cpp-server-cluster

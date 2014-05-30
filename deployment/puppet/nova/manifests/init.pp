@@ -48,7 +48,7 @@ class nova(
   # this should probably just be configured as a glance client
   $glance_api_servers = 'localhost:9292',
   # RPC
-  $queue_provider = 'rabbitmq',
+  $queue_provider = 'qpid',
   $amqp_hosts = 'localhost',
   $amqp_user = 'guest',
   $amqp_password = 'guest',
@@ -234,8 +234,9 @@ if $use_syslog and !$debug { #syslog and nondebug case
       nova_config {
         'DEFAULT/qpid_hosts':    value => $amqp_hosts;
         'DEFAULT/qpid_username': value => $amqp_user;
-        'DEFAULT/qpid_password': value => $rabbit_virtual_host;
+        'DEFAULT/qpid_password': value => $amqp_password;
         'DEFAULT/rpc_backend':   value => 'nova.rpc.impl_qpid';
+        'DEFAULT/qpid_sasl_mechanism': value => 'DIGEST-MD5';
       }
     }
   }

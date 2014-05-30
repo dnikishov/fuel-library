@@ -16,7 +16,7 @@ class openstack::ceilometer (
   $db_password         = 'ceilometer_pass',
   $db_dbname           = 'ceilometer',
   $mongo_replicaset    = false,
-  $queue_provider      = 'rabbitmq',
+  $queue_provider      = 'qpid',
   $amqp_hosts          = '127.0.0.1',
   $amqp_user           = 'guest',
   $amqp_password       = 'rabbit_pw',

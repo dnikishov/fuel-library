@@ -95,6 +95,7 @@ class neutron (
           'DEFAULT/qpid_port':     value => $neutron_config['amqp']['port'];
           'DEFAULT/qpid_username': value => $neutron_config['amqp']['username'];
           'DEFAULT/qpid_password': value => $neutron_config['amqp']['passwd'];
+          'DEFAULT/qpid_sasl_mechanism': value => 'DIGEST-MD5';
         }
     }
   }

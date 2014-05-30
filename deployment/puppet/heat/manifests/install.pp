@@ -38,6 +38,7 @@ class heat::install (
   $api_cfn_bind_port             = '8000',
   $api_cloudwatch_bind_host      = '0.0.0.0',
   $api_cloudwatch_bind_port      = '8003',
+  $queue_provider                = 'rabbitmq',
 ){
 
   include heat::params
@@ -114,16 +115,16 @@ class heat::install (
     'DEFAULT/db_backend'                                      : value => $db_backend;
     'DEFAULT/instance_connection_https_validate_certificates' : value => $ic_https_validate_certs;
     'DEFAULT/instance_connection_is_secure'                   : value => $ic_is_secure;
-    'DEFAULT/rpc_backend'                                     : value => $rpc_backend;
+    #'DEFAULT/rpc_backend'                                     : value => $rpc_backend;
     'DEFAULT/use_stderr'                                      : value => $use_stderr;
     #'DEFAULT/logging_context_format_string'                   : value => $logging_context_format_string;
     #'DEFAULT/logging_default_format_string'                   : value => $logging_default_format_string;
-    'DEFAULT/rabbit_hosts'                                    : value => $amqp_hosts;
-    'DEFAULT/rabbit_userid'                                   : value => $amqp_user;
-    'DEFAULT/rabbit_password'                                 : value => $amqp_password;
-    'DEFAULT/rabbit_ha_queues'                                : value => $rabbit_ha_queues;
-    'DEFAULT/rabbit_virtualhost'                              : value => $rabbit_virtualhost;
-    'DEFAULT/kombu_reconnect_delay'                           : value       => '5.0';
+    #'DEFAULT/rabbit_hosts'                                    : value => $amqp_hosts;
+    #'DEFAULT/rabbit_userid'                                   : value => $amqp_user;
+    #'DEFAULT/rabbit_password'                                 : value => $amqp_password;
+    #'DEFAULT/rabbit_ha_queues'                                : value => $rabbit_ha_queues;
+    #'DEFAULT/rabbit_virtualhost'                              : value => $rabbit_virtualhost;
+    #'DEFAULT/kombu_reconnect_delay'                           : value       => '5.0';
     'DEFAULT/debug'                                           : value => $debug;
     'DEFAULT/verbose'                                         : value => $verbose;
     'ec2authtoken/keystone_ec2_uri'                           : value => $keystone_ec2_uri;
@@ -141,6 +142,28 @@ class heat::install (
     'keystone_authtoken/admin_user'                           : value => $keystone_user;
     'keystone_authtoken/admin_password'                       : value => $keystone_password;
     'keystone_authtoken/auth_uri'                             : value => "${keystone_protocol}://${keystone_host}:${keystone_service_port}/v2.0";
+  }
+
+  case $queue_provider {
+    'rabbitmq': {
+      heat_config {
+        'DEFAULT/rpc_backend':           value => 'heat.openstack.common.rpc.impl_kombu';
+        'DEFAULT/rabbit_hosts':          value => $amqp_hosts;
+        'DEFAULT/rabbit_userid':         value => $amqp_user;
+        'DEFAULT/rabbit_password':       value => $amqp_password;
+        'DEFAULT/rabbit_virtual_host':   value => $rabbit_virtual_host;
+        'DEFAULT/kombu_reconnect_delay': value => '5.0';
+      }
+    }
+    'qpid': {
+      heat_config {
+        'DEFAULT/rpc_backend':   value => 'heat.openstack.common.rpc.impl_qpid';
+        'DEFAULT/qpid_hosts':    value => $amqp_hosts;
+        'DEFAULT/qpid_username': value => $amqp_user;
+        'DEFAULT/qpid_password': value => $amqp_password;
+        'DEFAULT/qpid_sasl_mechanism': value => 'DIGEST-MD5';
+      }
+    }
   }
 
 }

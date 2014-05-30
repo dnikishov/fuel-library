@@ -57,7 +57,7 @@ class openstack::nova::controller (
   $nova_db_user              = 'nova',
   $nova_db_dbname            = 'nova',
   # RPC
-  $queue_provider            = 'rabbitmq',
+  $queue_provider            = 'qpid',
   $amqp_hosts                = ['127.0.0.1'],
   $amqp_user                 = 'nova',
   $amqp_password             = 'rabbit_pw',
@@ -101,7 +101,7 @@ class openstack::nova::controller (
   # Configure the db string
   case $db_type {
     'mysql': {
-      $nova_db = "mysql://${nova_db_user}:${nova_db_password}@${db_host}/${nova_db_dbname}?read_timeout=60"
+      $nova_db = "mysql://${nova_db_user}:${nova_db_password}@${db_host}/${nova_db_dbname}"
     }
   }
 
@@ -135,6 +135,7 @@ class openstack::nova::controller (
         qpid_username     => $amqp_user,
         qpid_password     => $amqp_password,
         qpid_nodes        => [$internal_address],
+        qpid_cluster           => $rabbit_cluster,
       }
     }
   }

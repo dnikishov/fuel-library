@@ -32,6 +32,22 @@ $sat_base_channels, $sat_openstack_channel, $numtries = 10)  {
     ensure => directory,
   } ->
 
+  file { '/etc/pki/product/69.pem':
+    ensure => present,
+    source => 'puppet:///modules/rpmcache/certs/69.pem',
+    owner => 'root',
+    group => 'root',
+    mode => 0644,
+  } ->
+
+  file { '/etc/pki/product/191.pem':
+    ensure => present,
+    source => 'puppet:///modules/rpmcache/certs/191.pem',
+    owner => 'root',
+    group => 'root',
+    mode => 0644,
+  } ->
+
   file { '/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release':
     ensure => present,
     source => 'puppet:///modules/rpmcache/RPM-GPG-KEY-redhat-release',
@@ -55,6 +71,15 @@ $sat_base_channels, $sat_openstack_channel, $numtries = 10)  {
   file { '/etc/nailgun/required-rpms.txt':
     ensure => present,
     source => 'puppet:///modules/rpmcache/required-rpms.txt',
+    owner => 'root',
+    group => 'root',
+    mode => 0644,
+    require => File['/etc/nailgun/']
+  } ->
+
+  file { '/etc/nailgun/rdo-rpms.txt':
+    ensure => present,
+    source => 'puppet:///modules/rpmcache/rdo-rpms.txt',
     owner => 'root',
     group => 'root',
     mode => 0644,
@@ -90,10 +115,11 @@ $sat_base_channels, $sat_openstack_channel, $numtries = 10)  {
     arch => "x86_64",
     breed => "redhat",
     osversion => "rhel6",
-    ksmeta => "tree=http://@@server@@:8080/rhel/6.4/nailgun/x86_64/",
+    ksmeta => "tree=http://@@server@@:8080/rhel/6.5/nailgun/x86_64",
   } ->
 
   cobbler_profile { "rhel-x86_64":
+    server => $::fuel_settings['ADMIN_NETWORK']['ipaddress'],
     kickstart => "/var/lib/cobbler/kickstarts/centos-x86_64.ks",
     kopts => "biosdevname=0",
     distro => "rhel-x86_64",

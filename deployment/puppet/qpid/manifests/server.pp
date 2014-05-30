@@ -5,7 +5,7 @@ class qpid::server(
   $package_ensure = present,
   $service_ensure = running,
 
-  $qpid_port = '5672',
+  $qpid_port = '5673',
   $auth = 'no',
   $auth_realm = 'QPID',
   $log_to_file = 'UNSET',
@@ -26,18 +26,35 @@ class qpid::server(
     ensure => $package_ensure,
   }
 
-  define qpid_safe_package(){
-    if ! defined(Package[$name]){
-      @package { $name : }
+  #define qpid_safe_package(){
+  #  if ! defined(Package[$name]){
+  #    @package { $name : }
+  #  }
+  #}
+
+  if $qpid_cluster {
+    package { $qpid::params::cluster_package_name:
+      notify => Exec['reload corosync for qpid'],
     }
   }
 
+  exec { 'reload corosync for qpid': 
+    command => '/etc/init.d/corosync reload',
+    timeout => 0,
+    refreshonly => true,
+    notify => Service[$qpid::params::service_name]
+  }
 
-  if size($qpid_nodes) > 1 {
-    package { [$qpid::params::additional_packages]:
-      ensure => $package_ensure,
-    }
-    qpid_safe_package { $qpid::params::additional_packages : }
+  #if $::osfamily == 'RedHat' {
+  #  Package[$qpid::params::cluster_package_name] {
+  #    before => Service['corosync']
+  #  }
+  #}
+
+  package { [$qpid::params::additional_packages]:
+    ensure => $package_ensure,
+  }
+  #if size($qpid_nodes) > 1 {
     #Disable routing because it creates duplicates. Need upstream fixes
 #    file { '/usr/local/bin/qpid-setup-routes.sh':
 #      ensure  => present,
@@ -53,7 +70,7 @@ class qpid::server(
 #      subscribe => File['/usr/local/bin/qpid-setup-routes.sh'],
 #      logoutput => true,
 #    }
-  }
+  #}
   if $auth == 'yes' {
     qpid_user { 'qpid_user':
       password => $qpid_password,
@@ -70,6 +87,11 @@ class qpid::server(
       group  => 'qpidd',
       mode   => '0600',
       before => File[$::qpid::params::config_file]
+    }
+
+    package {'cyrus-sasl-md5':
+      ensure => installed,
+      before => Package[$::qpid::params::package_name],
     }
   }
   file { $::qpid::params::config_file:
@@ -91,6 +113,17 @@ class qpid::server(
       before  => File[$::qpid::params::config_file],
     }
   }
+
+  if $qpid_cluster {
+    service { $::qpid::params::service_name:
+      enable => true,
+      ensure => $service_ensure,
+      hasstatus  => true,
+      hasrestart => true,
+      require => [Package[$::qpid::params::package_name], File[$::qpid::params::config_file], Exec['reload corosync for qpid']],
+    }
+
+  } else {
     service { $::qpid::params::service_name:
       enable => true,
       ensure => $service_ensure,
@@ -98,7 +131,7 @@ class qpid::server(
       hasrestart => true,
       require => [Package[$::qpid::params::package_name], File[$::qpid::params::config_file]],
     }
-
+  }
 }
 
 

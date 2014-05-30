@@ -30,7 +30,7 @@ done
 
 #Register
 exitcode=0
-rhsmoutput=$(subscription-manager register "--username=<%= rh_username %>" "--password=<%= rh_password %>" --autosubscribe --force 2>&1) || exitcode=$?
+rhsmoutput=$(subscription-manager register "--username=<%= @rh_username %>" "--password=<%= @rh_password %>" --autosubscribe --force 2>&1) || exitcode=$?
 exitcode=$?
 case $exitcode in
 0) echo "Register succeeded"
@@ -187,13 +187,24 @@ yum-config-manager --disable '*rhel*' &> /dev/null || :
 
 #Purge Django 1.3 RPM
 rm -f <%= pkgdir %>/Packages/Django-1.3*
+rm -f <%= pkgdir %>/Packages/pyOpenSSL*
+rm -f <%= pkgdir %>/Packages/kernel*
 
-rpm -i <%= pkgdir %>/Packages/rhel-boot-image-6.4-20130130.0.el6ost.noarch.rpm
-mkdir -p /mnt/rhel_iso
-mount -o loop /usr/share/rhel-boot-image/rhel-boot-image-6.4-20130130.0.el6ost.iso /mnt/rhel_iso
+#rpm -i <%= pkgdir %>/Packages/rhel-boot-image-6.5-20131111.0.el6ost.noarch.rpm
+#mkdir -p /mnt/rhel_iso
+#mount -o loop /opt/rhel-server.iso /mnt/rhel_iso
 cp -R /mnt/rhel_iso/. <%= pkgdir %>
-umount /mnt/rhel_iso
-rpm -e rhel-boot-image-6.4-20130130.0.el6ost.noarch
+#umount /mnt/rhel_iso
+#rpm -e rhel-boot-image
+
+
+revert_back_to_centos
+yum install -y http://rdo.fedorapeople.org/rdo-release.rpm
+yum-config-manager --disable 'nailgun' &> /dev/null
+mkdir -p <%= pkgdir %>/rdo/Packages
+yumdownloader --resolve --destdir=<%= pkgdir %>/rdo/Packages $(cat /etc/nailgun/rdo-rpms.txt | xargs echo -en) 
+yum-config-manager --enable 'nailgun' &> /dev/null
+yum remove -y rdo-release
 
 exit 0
 

@@ -8,7 +8,7 @@ class osnailyfacter::rpmcache {
 
   class { 'rpmcache::rpmcache':
     releasever => "6Server",
-    pkgdir => "/var/www/nailgun/rhel/6.4/nailgun/x86_64",
+    pkgdir => "/var/www/nailgun/rhel/6.5/nailgun/x86_64",
     rh_username => $::fuel_settings['rh_username'],
     rh_password => $::fuel_settings['rh_password'],
     rh_base_channels => $rh_base_channels,

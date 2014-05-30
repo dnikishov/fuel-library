@@ -7,7 +7,7 @@ class openstack::cinder(
   $sql_connection,
   $cinder_user_password,
   $glance_api_servers,
-  $queue_provider         = 'rabbitmq',
+  $queue_provider         = 'qpid',
   $amqp_hosts             = '127.0.0.1',
   $amqp_user              = 'nova',
   $amqp_password          = 'rabbit_pw',

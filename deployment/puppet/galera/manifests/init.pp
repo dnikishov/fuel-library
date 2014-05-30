@@ -83,7 +83,7 @@ class galera (
       file { '/etc/init.d/mysql':
         ensure  => present,
         mode    => '0644',
-        require => Package['MySQL-server'],
+        require => Package['MySQL-server-wsrep'],
         before  => File['mysql-wss-ocf']
       }
 
@@ -93,24 +93,24 @@ class galera (
         before => File['mysql-wss-ocf']
       }
 
-      package { 'MySQL-client':
+      package { 'MySQL-client-wsrep':
         ensure => present,
-        before => Package['MySQL-server']
+        before => Package['MySQL-server-wsrep']
       }
 
       package { 'wget':
         ensure => present,
-        before => Package['MySQL-server']
+        before => Package['MySQL-server-wsrep']
       }
 
       package { 'bc':
         ensure => present,
-        before => Package['MySQL-server']
+        before => Package['MySQL-server-wsrep']
       }
 
       package { 'perl':
         ensure => present,
-        before => Package['MySQL-client']
+        before => Package['MySQL-client-wsrep']
       }
     }
     'Debian' : {
@@ -119,7 +119,7 @@ class galera (
         ensure  => present,
         mode    => '0644',
         source => 'puppet:///modules/galera/mysql.init' ,
-        require => Package['MySQL-server'],
+        require => Package['MySQL-server-wsrep'],
         before  => File['mysql-wss-ocf']
       }
 
@@ -141,17 +141,17 @@ class galera (
 
       package { 'bc':
         ensure => present,
-        before => Package['MySQL-server']
+        before => Package['MySQL-server-wsrep']
       }
 
       package { 'mysql-client':
         ensure => present,
-        before => Package['MySQL-server']
+        before => Package['MySQL-server-wsrep']
       }
 
       package { 'mysql-common':
         ensure => present,
-        before => Package['MySQL-server']
+        before => Package['MySQL-server-wsrep']
       }
 
     }
@@ -197,7 +197,7 @@ class galera (
   }
   File<| title == 'ocf-mirantis-path' |> -> File['mysql-wss-ocf']
 
-  Package['MySQL-server'] -> File['mysql-wss-ocf']
+  Package['MySQL-server-wsrep'] -> File['mysql-wss-ocf']
   Package['galera'] -> File['mysql-wss-ocf']
   File['mysql-wss-ocf'] -> Cs_resource[$res_name]
 
@@ -217,7 +217,7 @@ class galera (
 
   package { [$::galera::params::libssl_package, $::galera::params::libaio_package]:
     ensure => present,
-    before => Package["galera", "MySQL-server"]
+    before => Package["galera", "MySQL-server-wsrep"]
   }
 
   if $::galera::params::mysql_version {
@@ -225,7 +225,7 @@ class galera (
   } else {
     $wsrep_version = 'installed'
   }
-  package { "MySQL-server":
+  package { "MySQL-server-wsrep":
     ensure   => $wsrep_version,
     name     => $::galera::params::mysql_server_name,
     provider => $::galera::params::pkg_provider,
@@ -239,8 +239,8 @@ class galera (
   # Uncomment the following Exec and sequence arrow to obtain full MySQL server installation log
   #  ->
   #  exec { "debug -mysql-server-installation" :
-  #    command     => "/usr/bin/yum -d 10 -e 10 -y install MySQL-server 2>&1 | tee mysql_install.log",
-  #    before => Package["MySQL-server"],
+  #    command     => "/usr/bin/yum -d 10 -e 10 -y install MySQL-server-wsrep 2>&1 | tee mysql_install.log",
+  #    before => Package["MySQL-server-wsrep"],
   #    logoutput => true,
   #  }
 
@@ -268,7 +268,7 @@ class galera (
       content => template("galera/wsrep.cnf.erb"),
       require => [File["/etc/mysql/conf.d"], File["/etc/mysql"]],
     }
-    File["/etc/mysql/conf.d/wsrep.cnf"] -> Package['MySQL-server']
+    File["/etc/mysql/conf.d/wsrep.cnf"] -> Package['MySQL-server-wsrep']
   }
 
 #TODO: find another way of mysql initial replication users creation
@@ -312,7 +312,7 @@ class galera (
 
 
   File['/tmp/wsrep-init-file'] -> Service[$cib_name] -> Exec['wait-initial-sync'] -> Exec['wait-for-synced-state'] -> Exec ['rm-init-file']
-  Package['MySQL-server'] ~> Exec['wait-initial-sync']
+  Package['MySQL-server-wsrep'] ~> Exec['wait-initial-sync']
 
 # FIXME: This class is deprecated and should be removed in future releases.
 

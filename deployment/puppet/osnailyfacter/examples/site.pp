@@ -135,7 +135,7 @@ class advanced_node_netconfig {
 case $::operatingsystem {
   'redhat' : {
     $queue_provider = 'qpid'
-    $custom_mysql_setup_class = 'pacemaker_mysql'
+    $custom_mysql_setup_class = 'galera'
   }
   default: {
     $queue_provider='rabbitmq'

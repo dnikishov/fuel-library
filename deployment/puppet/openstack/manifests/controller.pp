@@ -108,7 +108,7 @@ class openstack::controller (
   $internal_address,
   $admin_address,
   # RPC
-  $queue_provider          = 'rabbitmq',
+  $queue_provider          = 'qpid',
   $amqp_hosts              = '127.0.0.1',
   $amqp_user               = 'nova',
   $amqp_password           = 'rabbit_pw',
@@ -433,7 +433,7 @@ class openstack::controller (
   if $cinder {
     if !defined(Class['openstack::cinder']) {
       class {'openstack::cinder':
-        sql_connection       => "mysql://${cinder_db_user}:${cinder_db_password}@${db_host}/${cinder_db_dbname}?charset=utf8&read_timeout=60",
+        sql_connection       => "mysql://${cinder_db_user}:${cinder_db_password}@${db_host}/${cinder_db_dbname}",
         queue_provider       => $queue_provider,
         amqp_hosts           => $amqp_hosts,
         amqp_user            => $amqp_user,

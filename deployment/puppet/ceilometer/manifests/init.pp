@@ -30,7 +30,7 @@ class ceilometer(
   $use_syslog          = false,
   $syslog_log_facility = 'LOG_SYSLOG',
   $syslog_log_level    = 'WARNING',
-  $queue_provider      = 'rabbitmq',
+  $queue_provider      = 'qpid',
   $amqp_hosts          = '127.0.0.1',
   $amqp_user           =  'guest',
   $amqp_password       = 'rabbit_pw',
@@ -101,6 +101,7 @@ class ceilometer(
         'DEFAULT/qpid_password': value => $amqp_password;
         'DEFAULT/rpc_backend':
           value => 'ceilometer.openstack.common.rpc.impl_qpid';
+        'DEFAULT/qpid_sasl_mechanism': value => 'DIGEST-MD5';
       }
     }
   }

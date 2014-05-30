@@ -81,7 +81,7 @@ class openstack::glance (
   # Configure the db string
   case $db_type {
     'mysql': {
-      $sql_connection = "mysql://${glance_db_user}:${glance_db_password}@${db_host}/${glance_db_dbname}?read_timeout=60"
+      $sql_connection = "mysql://${glance_db_user}:${glance_db_password}@${db_host}/${glance_db_dbname}"
     }
   }
 
@@ -141,19 +141,7 @@ class openstack::glance (
 
   # Configure rabbitmq notifications
   # TODO(bogdando) sync qpid support from upstream
-  class { 'glance::notify::rabbitmq':
-    rabbit_password              => $rabbit_password,
-    rabbit_userid                => $rabbit_userid,
-    rabbit_hosts                 => $rabbit_hosts_real,
-    rabbit_host                  => $rabbit_host,
-    rabbit_port                  => $rabbit_port,
-    rabbit_virtual_host          => $rabbit_virtual_host,
-    rabbit_use_ssl               => $rabbit_use_ssl,
-    rabbit_notification_exchange => $rabbit_notification_exchange,
-    rabbit_notification_topic    => $rabbit_notification_topic,
-    amqp_durable_queues          => $amqp_durable_queues,
-  }
-
+  
   # Configure file storage backend
 
 

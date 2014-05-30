@@ -9,7 +9,7 @@
 
 class cinder::base (
   $sql_connection,
-  $queue_provider         = 'rabbitmq',
+  $queue_provider         = 'qpid',
   $amqp_hosts             = '127.0.0.1',
   $amqp_user              = 'nova',
   $amqp_password          = 'rabbit_pw',
@@ -103,6 +103,7 @@ class cinder::base (
         'DEFAULT/qpid_hosts':    value => $amqp_hosts;
         'DEFAULT/qpid_username': value => $amqp_user;
         'DEFAULT/qpid_password': value => $amqp_password;
+        'DEFAULT/qpid_sasl_mechanism': value => 'DIGEST-MD5';
       }
     }
   }
